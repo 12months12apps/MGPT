@@ -1,5 +1,5 @@
 "use client";
-import { Field } from "o1js";
+import { Field, PrivateKey } from "o1js";
 import { useEffect, useState } from "react";
 import GradientBG from "../components/GradientBG";
 import styles from "../styles/Home.module.css";
@@ -7,7 +7,7 @@ import "./reactCOIServiceWorker";
 import ZkappWorkerClient from "./zkappWorkerClient";
 
 const transactionFee = 0.1;
-const ZKAPP_ADDRESS = "B62qpXPvmKDf4SaFJynPsT6DyvuxMS9H1pT4TGonDT26m599m7dS9gP";
+const ZKAPP_ADDRESS = "B62qrDdA1K8w3xNwk7snEEetAKKtZB5ywaesg89dQopVCqdX79n3Axy";
 
 export default function Home() {
   const [zkappWorkerClient, setZkappWorkerClient] =
@@ -108,7 +108,7 @@ export default function Home() {
     };
 
     checkAccountExists();
-  }, [zkappWorkerClient, hasBeenSetup, accountExists]);
+  }, [zkappWorkerClient, hasBeenSetup, accountExists, publicKeyBase58]);
 
   // -------------------------------------------------------
   // Send a transaction
@@ -158,6 +158,72 @@ export default function Home() {
     } catch (error: any) {
       displayStep(`Error refreshing state: ${error.message}`);
     }
+  };
+
+  const deployNewContract = async () => {
+    const mina = (window as any).mina;
+
+    if (mina == null) {
+      setHasWallet(false);
+      return;
+    }
+
+    setCreatingTransaction(true);
+    console.log("sending a deployment transaction...");
+
+    await zkappWorkerClient!.fetchAccount(publicKeyBase58);
+
+    const privateKey = PrivateKey.random();
+    console.log("generated new contract private key...");
+    console.log(privateKey.toBase58);
+
+    const zkappPublicKey = privateKey.toPublicKey();
+    const contractPK = zkappPublicKey.toBase58();
+    console.log("its corresponding public key is...");
+    console.log(contractPK);
+
+    console.log("creating deployment transaction...");
+    if (!publicKeyBase58) return;
+    await zkappWorkerClient!.createDeployContract(
+      privateKey.toBase58(),
+      publicKeyBase58
+    );
+
+    console.log("getting Transaction JSON...");
+    const transactionJSON = await zkappWorkerClient!.getTransactionJSON();
+    console.log(transactionJSON);
+
+    const { hash } = await (window as any).mina.sendTransaction({
+      transaction: transactionJSON,
+      feePayer: {
+        fee: transactionFee,
+        memo: "",
+      },
+    });
+
+    const transactionLink = `https://minascan.io/devnet/tx/${hash}`;
+    console.log("See transaction at", transactionLink);
+    
+    // console.log("checking AURO connection");
+    // const network = await window.mina.requestNetwork();
+    // console.log(network); //  'Mainnet' , 'Devnet' , 'Berkeley' or 'Unknown'
+    // const accounts = await window.mina.requestAccounts();
+    // console.log(accounts);
+    // console.log("requesting send transaction...");
+    // const { hash } = await (window as any).mina.sendTransaction({
+    //   transaction: transactionJSON,
+    //   feePayer: {
+    //     fee: transactionFee,
+    //     memo: "",
+    //   },
+    // });
+
+    // console.log("See transaction at https://minascan.io/devnet/tx/" + hash);
+
+    setCreatingTransaction(false);
+    // setDeploymentTX(hash);
+    // setContractPK(contractPK);
+    // setZkappPublicKey(zkappPublicKey);
   };
 
   // -------------------------------------------------------
@@ -226,6 +292,7 @@ export default function Home() {
         >
           Send Transaction
         </button>
+        <button onClick={deployNewContract}>deploy new</button>
         <button className={styles.card} onClick={onRefreshCurrentNum}>
           Get Latest State
         </button>

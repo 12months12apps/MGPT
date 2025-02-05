@@ -51,4 +51,8 @@ export default class ZkappWorkerClient {
     return this.remoteApi.getTransactionJSON();
   }
 
+  async createDeployContract(privateKey58: string, feePayerAddress58: string) {
+    return this.remoteApi.createDeployContract(privateKey58, feePayerAddress58);
+  }
+
 }

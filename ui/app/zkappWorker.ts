@@ -1,4 +1,4 @@
-import { Mina, PublicKey, fetchAccount } from 'o1js';
+import { AccountUpdate, Mina, PrivateKey, PublicKey, fetchAccount } from 'o1js';
 import * as Comlink from "comlink";
 import type { Add } from '../../contracts/src/Add';
 
@@ -45,6 +45,18 @@ export const api = {
   },
   async getTransactionJSON() {
     return state.transaction!.toJSON();
+  },
+  async createDeployContract(privateKey58: string, feePayerAddress58: string) {
+    const zkAppPrivateKey = PrivateKey.fromBase58(privateKey58);
+    const feePayer = PublicKey.fromBase58(feePayerAddress58);
+    state.zkappInstance = new state.AddInstance!(zkAppPrivateKey.toPublicKey());
+
+    state.transaction = await Mina.transaction(feePayer, async () => {
+      await AccountUpdate.fundNewAccount(feePayer);
+      await state.zkappInstance!.deploy();
+    });
+    
+    state.transaction.sign([zkAppPrivateKey]);
   },
 };
 
