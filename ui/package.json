@@ -12,6 +12,7 @@
     "deploy": "next build --no-lint && touch out/.nojekyll && node ./ghp-postbuild && git add -f out && git commit -m \"Deploy gh-pages\" && cd .. && git subtree push --prefix ui/out origin gh-pages"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
     "coi-serviceworker": "^0.1.7",
     "comlink": "^4.4.1",
     "next": "14.2.3",
@@ -23,6 +24,6 @@
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "typescript": "^5"
+    "typescript": "^5.7.3"
   }
 }

@@ -1,10 +1,12 @@
 "use client";
 import { Field, PrivateKey } from "o1js";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import GradientBG from "../components/GradientBG";
 import styles from "../styles/Home.module.css";
 import "./reactCOIServiceWorker";
 import ZkappWorkerClient from "./zkappWorkerClient";
+import { Editor } from "@monaco-editor/react";
+import * as typescript from 'typescript';
 
 const transactionFee = 0.1;
 const ZKAPP_ADDRESS = "B62qrDdA1K8w3xNwk7snEEetAKKtZB5ywaesg89dQopVCqdX79n3Axy";
@@ -203,7 +205,7 @@ export default function Home() {
 
     const transactionLink = `https://minascan.io/devnet/tx/${hash}`;
     console.log("See transaction at", transactionLink);
-    
+
     // console.log("checking AURO connection");
     // const network = await window.mina.requestNetwork();
     // console.log(network); //  'Mainnet' , 'Devnet' , 'Berkeley' or 'Unknown'
@@ -309,6 +311,53 @@ export default function Home() {
           {mainContent}
         </div>
       </div>
+      <CodeEditor />
     </GradientBG>
   );
 }
+
+function compileTsToJs(tsCode: string) {
+  return typescript.transpileModule(tsCode, {
+    compilerOptions: {
+      target: typescript.ScriptTarget.ES2015,
+      module: typescript.ModuleKind.ESNext,
+      experimentalDecorators: true,
+      emitDecoratorMetadata: true,
+    },
+  }).outputText;
+}
+
+const CodeEditor = () => {
+  const [jsOutput, setJsOutput] = useState("");
+  const editorRef = useRef<any>(null);
+
+  const handleEditorDidMount = (editor: any) => {
+    editorRef.current = editor;
+  };
+
+  const handleCompile = () => {
+    if (!editorRef.current) return;
+    const tsCode = editorRef.current.getValue();
+    const jsCode = compileTsToJs(tsCode);
+    console.log(jsCode);
+    setJsOutput(jsCode);
+  };
+
+  return (
+    <div>
+      <Editor
+        height="50vh"
+        defaultLanguage="typescript"
+        theme="vs-dark"
+        onMount={handleEditorDidMount}
+        options={{
+          minimap: { enabled: false },
+        }}
+      />
+      <button onClick={handleCompile}>
+        Compile to JS
+      </button>
+      <pre>{jsOutput}</pre>
+    </div>
+  );
+};
