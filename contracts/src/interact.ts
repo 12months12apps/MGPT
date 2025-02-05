@@ -17,7 +17,7 @@ import { Mina, NetworkId, PrivateKey } from 'o1js';
 import { Add } from './Add.js';
 
 // check command line arg
-const deployAlias = process.argv[2];
+let deployAlias = process.argv[2];
 if (!deployAlias)
   throw Error(`Missing <deployAlias> argument.
 
@@ -41,17 +41,18 @@ type Config = {
     }
   >;
 };
-const configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
-const config = configJson.deployAliases[deployAlias];
-const feepayerKeysBase58: { privateKey: string; publicKey: string } =
-  JSON.parse(await fs.readFile(config.feepayerKeyPath, 'utf8'));
+let configJson: Config = JSON.parse(await fs.readFile('config.json', 'utf8'));
+let config = configJson.deployAliases[deployAlias];
+let feepayerKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
+  await fs.readFile(config.feepayerKeyPath, 'utf8')
+);
 
-const zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
+let zkAppKeysBase58: { privateKey: string; publicKey: string } = JSON.parse(
   await fs.readFile(config.keyPath, 'utf8')
 );
 
-const feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
-const zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
+let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
+let zkAppKey = PrivateKey.fromBase58(zkAppKeysBase58.privateKey);
 
 // set up Mina instance and contract we interact with
 const Network = Mina.Network({
@@ -63,9 +64,9 @@ const Network = Mina.Network({
 // const Network = Mina.Network(config.url);
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 Mina.setActiveInstance(Network);
-const feepayerAddress = feepayerKey.toPublicKey();
-const zkAppAddress = zkAppKey.toPublicKey();
-const zkApp = new Add(zkAppAddress);
+let feepayerAddress = feepayerKey.toPublicKey();
+let zkAppAddress = zkAppKey.toPublicKey();
+let zkApp = new Add(zkAppAddress);
 
 // compile the contract to create prover keys
 console.log('compile the contract...');
@@ -74,7 +75,7 @@ await Add.compile();
 try {
   // call update() and send transaction
   console.log('build transaction and create proof...');
-  const tx = await Mina.transaction(
+  let tx = await Mina.transaction(
     { sender: feepayerAddress, fee },
     async () => {
       await zkApp.update();

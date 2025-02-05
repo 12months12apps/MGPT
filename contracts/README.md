@@ -1,4 +1,4 @@
-# Mina zkApp: Contracts
+# MinaGPT Demo zkApp
 
 This template uses TypeScript.
 

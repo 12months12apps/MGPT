@@ -1,6 +1,6 @@
 # NodeJS
-build
 node_modules
+build
 coverage
 
 # Editor
