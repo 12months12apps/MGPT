@@ -134,16 +134,49 @@ Try asking me to create a simple counter contract or any other zkApp you'd like 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
 
-    const response = await fetch(
-      `http://localhost:5099/api/mina?prompt=${input}`
-    );
-    const data = await response.json();
-    const assistantMessage = {
-      role: "assistant",
-      content: data.data,
-    } as Message;
-    console.log(data.data);
+    const assistantMessage = { role: "assistant", content: "" } as Message;
     setMessages((prev) => [...prev, assistantMessage]);
+
+    try {
+      const encodedPrompt = encodeURIComponent(input);
+      const response = await fetch(
+        `http://localhost:5099/api/mina?prompt=${encodedPrompt}`,
+        {
+          headers: {
+            Accept: "text/event-stream",
+            "Cache-Control": "no-cache",
+          },
+        }
+      );
+      const reader = response.body?.getReader();
+      if (!reader) return;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const text = new TextDecoder().decode(value);
+        const lines = text.split("\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            try {
+              const data = JSON.parse(line.slice(5));
+              setMessages((prev) => {
+                const newMessages = [...prev];
+                const lastMessage = newMessages[newMessages.length - 1];
+                lastMessage.content += data.content;
+                return newMessages;
+              });
+            } catch (e) {
+              console.error("Error parsing SSE message:", e);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
