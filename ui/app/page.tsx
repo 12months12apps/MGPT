@@ -18,7 +18,19 @@ export default function Home() {
   const [hasBeenSetup, setHasBeenSetup] = useState(false);
   const [accountExists, setAccountExists] = useState(false);
   const [publicKeyBase58, setPublicKeyBase58] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content: `👋 Hi! I'm MinaGPT, your AI assistant for writing Mina smart contracts.
+
+I can help you:
+- Write zkApp smart contracts
+- Explain Mina Protocol concepts
+- Deploy contracts to the Mina blockchain
+
+Try asking me to create a simple counter contract or any other zkApp you'd like to build!`,
+    },
+  ]);
   const [input, setInput] = useState("");
   const [displayText, setDisplayText] = useState("");
 
