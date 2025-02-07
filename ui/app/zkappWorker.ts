@@ -1,6 +1,6 @@
 import { AccountUpdate, Mina, PrivateKey, PublicKey, fetchAccount } from 'o1js';
 import * as Comlink from "comlink";
-import type { Add } from '../../contracts/src/Add';
+import type { Add } from '../contracts/src/Add';
 
 type Transaction = Awaited<ReturnType<typeof Mina.transaction>>;
 
@@ -18,7 +18,7 @@ export const api: any = {
     Mina.setActiveInstance(Network);
   },
   async loadContract() {
-    const { Add } = await import('../../contracts/build/src/Add.js');
+    const { Add } = await import('../contracts/build/src/Add.js');
     state.AddInstance = Add;
   },
   async loadCompiledContract(blobUrl: string) {

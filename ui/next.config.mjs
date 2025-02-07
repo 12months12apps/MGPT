@@ -42,16 +42,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  /* Used to serve the Next.js app from a subdirectory (the GitHub repo name) and
-   * assetPrefix is used to serve assets (JS, CSS, images, etc.) from that subdirectory
-   * when deployed to GitHub Pages. The assetPrefix needs to be added manually to any assets
-   * if they're not loaded by Next.js' automatic handling (for example, in CSS files or in a <img> element).
-   * The 'ghp-postbuild.js' script in this project prepends the repo name to asset urls in the built css files
-   * after running 'npm run deploy'.
-   */
-  basePath: process.env.NODE_ENV === "production" ? "/04-zkapp-browser-ui" : "", // update if your repo name changes for 'npm run deploy' to work correctly
-  assetPrefix:
-    process.env.NODE_ENV === "production" ? "/04-zkapp-browser-ui/" : "", // update if your repo name changes for 'npm run deploy' to work correctly
 };
 
 export default nextConfig;
