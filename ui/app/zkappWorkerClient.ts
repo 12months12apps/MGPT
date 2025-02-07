@@ -22,6 +22,10 @@ export default class ZkappWorkerClient {
     return this.remoteApi.loadContract();
   }
 
+  async loadCompiledContract(blobUrl: string) {
+    return this.remoteApi.loadCompiledContract(blobUrl);
+  }
+
   async compileContract() {
     return this.remoteApi.compileContract();
   }

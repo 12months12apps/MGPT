@@ -20,6 +20,16 @@ export const api = {
     const { Add } = await import('../../contracts/build/src/Add.js');
     state.AddInstance = Add;
   },
+  async loadCompiledContract(blobUrl: string) {
+    try {
+      const { Add } = await import(/* @vite-ignore */ blobUrl);
+      state.AddInstance = Add;
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Error loading compiled contract:', error);
+      throw error;
+    }
+  },
   async compileContract() {
     await state.AddInstance!.compile();
   },
