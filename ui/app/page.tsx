@@ -90,7 +90,12 @@ export default function Home() {
     auroLinkElem = (
       <div>
         Could not find a wallet.{" "}
-        <a href="https://www.aurowallet.com/" target="_blank" rel="noreferrer">
+        <a 
+          href="https://www.aurowallet.com/" 
+          target="_blank" 
+          rel="noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
           Install Auro wallet here
         </a>
       </div>
@@ -98,9 +103,7 @@ export default function Home() {
   }
 
   const setup = (
-    <div
-      style={{ fontWeight: "bold", fontSize: "1.5rem", paddingBottom: "5rem" }}
-    >
+    <div className="font-bold text-2xl pb-20">
       {displayText}
       {auroLinkElem}
     </div>
@@ -111,8 +114,13 @@ export default function Home() {
     const faucetLink = `https://faucet.minaprotocol.com/?address='${publicKeyBase58}`;
     accountDoesNotExist = (
       <div>
-        <span style={{ paddingRight: "1rem" }}>Account does not exist.</span>
-        <a href={faucetLink} target="_blank" rel="noreferrer">
+        <span className="pr-4">Account does not exist.</span>
+        <a 
+          href={faucetLink} 
+          target="_blank" 
+          rel="noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
           Visit the faucet to fund this fee payer account
         </a>
       </div>
@@ -121,8 +129,8 @@ export default function Home() {
 
   return (
     <>
-      <div style={{ padding: 0 }}>
-        <div style={{ padding: 0 }}>
+      <div className="p-0">
+        <div className="p-0">
           {setup}
           {accountDoesNotExist}
         </div>

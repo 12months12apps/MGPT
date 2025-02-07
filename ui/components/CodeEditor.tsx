@@ -129,22 +129,15 @@ export const CodeEditor = ({
           minimap: { enabled: false },
         }}
       />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          marginTop: "10px",
-        }}
-      >
-        <div style={{ display: "flex", gap: "10px" }}>
+      <div className="flex flex-col gap-2.5 mt-2.5">
+        <div className="flex gap-2.5">
           <button onClick={handleCompile}>Compile to JS</button>
           {hasBeenSetup && accountExists && (
             <button onClick={handleDeploy}>Deploy Contract</button>
           )}
         </div>
         {status && (
-          <div style={{ marginTop: "10px", fontWeight: "bold" }}>
+          <div className="mt-2.5 font-bold">
             {statusDisplay}
           </div>
         )}
