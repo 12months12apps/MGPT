@@ -7,7 +7,7 @@ import { examples } from './data'
 dotenv.config()
 
 const app = express()
-const PORT = 5099
+const PORT = process.env.PORT || 5099
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
