@@ -1,11 +1,8 @@
 "use client";
-import { PrivateKey } from "o1js";
 import { useEffect, useState } from "react";
 import "./reactCOIServiceWorker";
 import ZkappWorkerClient from "./zkappWorkerClient";
 import { CodeEditor } from "../components/CodeEditor";
-
-const transactionFee = 0.1;
 
 export default function Home() {
   const [zkappWorkerClient, setZkappWorkerClient] =
@@ -15,7 +12,6 @@ export default function Home() {
   const [accountExists, setAccountExists] = useState(false);
   const [publicKeyBase58, setPublicKeyBase58] = useState("");
   const [displayText, setDisplayText] = useState("");
-  const [transactionlink, setTransactionLink] = useState("");
 
   const displayStep = (step: string) => {
     setDisplayText(step);
@@ -89,64 +85,6 @@ export default function Home() {
     checkAccountExists();
   }, [zkappWorkerClient, hasBeenSetup, accountExists, publicKeyBase58]);
 
-  const deployNewContract = async () => {
-    try {
-      setTransactionLink("");
-      const mina = window.mina;
-
-      if (mina == null) {
-        setHasWallet(false);
-        return;
-      }
-
-      displayStep("Loading contract...");
-      // Load and compile contract first
-      await zkappWorkerClient!.loadContract();
-      displayStep("Compiling contract...");
-      await zkappWorkerClient!.compileContract();
-      displayStep("Deploying contract...");
-
-      console.log("sending a deployment transaction...");
-      await zkappWorkerClient!.fetchAccount(publicKeyBase58);
-
-      const privateKey = PrivateKey.random();
-      console.log("generated new contract private key...");
-      console.log(privateKey.toBase58);
-
-      const zkappPublicKey = privateKey.toPublicKey();
-      const contractPK = zkappPublicKey.toBase58();
-      console.log("its corresponding public key is...");
-      console.log(contractPK);
-
-      console.log("creating deployment transaction...");
-      if (!publicKeyBase58) return;
-      await zkappWorkerClient!.createDeployContract(
-        privateKey.toBase58(),
-        publicKeyBase58
-      );
-
-      console.log("getting Transaction JSON...");
-      const transactionJSON = await zkappWorkerClient!.getTransactionJSON();
-      console.log(transactionJSON);
-
-      const { hash } = await mina.sendTransaction({
-        transaction: transactionJSON,
-        feePayer: {
-          fee: transactionFee,
-          memo: "",
-        },
-      });
-
-      const transactionLink = `https://minascan.io/devnet/tx/${hash}`;
-      console.log("See transaction at", transactionLink);
-      setTransactionLink(transactionLink);
-      displayStep("Contract deployed.");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      displayStep(`Error during deployment: ${error.message}`);
-    }
-  };
-
   let auroLinkElem;
   if (hasWallet === false) {
     auroLinkElem = (
@@ -159,24 +97,11 @@ export default function Home() {
     );
   }
 
-  const stepDisplay = transactionlink ? (
-    <a
-      href={transactionlink}
-      target="_blank"
-      rel="noreferrer"
-      style={{ textDecoration: "underline" }}
-    >
-      View transaction
-    </a>
-  ) : (
-    displayText
-  );
-
   const setup = (
     <div
       style={{ fontWeight: "bold", fontSize: "1.5rem", paddingBottom: "5rem" }}
     >
-      {stepDisplay}
+      {displayText}
       {auroLinkElem}
     </div>
   );
@@ -194,25 +119,23 @@ export default function Home() {
     );
   }
 
-  let mainContent;
-  if (hasBeenSetup && accountExists) {
-    mainContent = (
-      <div style={{ justifyContent: "center", alignItems: "center" }}>
-        <button onClick={deployNewContract}>deploy new</button>
-      </div>
-    );
-  }
-
   return (
     <>
       <div style={{ padding: 0 }}>
         <div style={{ padding: 0 }}>
           {setup}
           {accountDoesNotExist}
-          {mainContent}
         </div>
       </div>
-      <CodeEditor />
+      {hasBeenSetup && accountExists && (
+        <CodeEditor
+          zkappWorkerClient={zkappWorkerClient}
+          hasBeenSetup={hasBeenSetup}
+          accountExists={accountExists}
+          publicKeyBase58={publicKeyBase58}
+          setHasWallet={setHasWallet}
+        />
+      )}
     </>
   );
 }
