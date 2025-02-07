@@ -1,7 +1,7 @@
 {
-  "name": "emailproofgpt-backend",
+  "name": "minagpt-backend",
   "version": "1.0.0",
-  "description": "Backend for EmailProofGPT",
+  "description": "Backend for MinaGPT",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev src/index.ts",

@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="ui/public/assets/MinaGPT.png" alt="MinaGPT Logo" width="120" />
+</div>
+
 # MinaGPT: Your All-in-One zkApp Assistant for Coding and One-Click Deployment
 
 MinaGPT transforms the way you build zkApps on the Mina blockchain, making it effortless and exciting. **Powered by AI**, it helps you **write smart contracts faster, smarter, and with greater confidence**. No clunky setups, no endless documentation—just your browser, your Mina wallet, and your ideas brought to life.
@@ -32,3 +36,9 @@ cd ui
 pnpm install
 pnpm run dev
 ```
+
+## Contact
+
+- Twitter: [@wfnuser](https://x.com/wfnuser)
+- Telegram: [@element14_revival](https://t.me/element14_revival)
+- Wechat: wfnusee

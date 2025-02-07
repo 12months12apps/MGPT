@@ -73,6 +73,7 @@ app.get('/api/mina', async (req, res) => {
     用户请求: ${userRequest}
     `
 
+    console.log('calling deepseek api')
     const completion = await openai.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
       model: 'deepseek-ai/DeepSeek-V3',
