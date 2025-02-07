@@ -18,6 +18,8 @@ export default function Home() {
   const [hasBeenSetup, setHasBeenSetup] = useState(false);
   const [accountExists, setAccountExists] = useState(false);
   const [publicKeyBase58, setPublicKeyBase58] = useState("");
+  // TODO: fix the style of the messages
+  // it seems that the markdown is not rendered
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
