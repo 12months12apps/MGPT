@@ -6,6 +6,7 @@ import ZkappWorkerClient from "./zkappWorkerClient";
 import { CodeEditor } from "../components/CodeEditor";
 import Image from "next/image";
 import { ChatInput } from "../components/ChatInput";
+import SocialLinks from "../components/SocialLinks";
 
 interface Message {
   role: "user" | "assistant";
@@ -31,7 +32,9 @@ I can help you:
 - Explain Mina Protocol concepts
 - Deploy contracts to the Mina blockchain
 
-Try asking me to create a simple counter contract or any other zkApp you'd like to build!`,
+Try asking me to create a simple counter contract or any other zkApp you'd like to build!
+
+Stay tuned for more features. This app is developed by [@wfnuser](https://x.com/wfnuser) - follow him on X for updates and make friends!`,
     },
   ]);
   const [displayText, setDisplayText] = useState("");
@@ -205,7 +208,7 @@ Try asking me to create a simple counter contract or any other zkApp you'd like 
 
       {hasBeenSetup && (
         <>
-          <div className="pl-2 border-b flex items-center">
+          <div className="pl-2 border-b flex items-center justify-between">
             <Image
               src="/assets/MinaGPT.png"
               alt="MinaGPT"
@@ -214,6 +217,9 @@ Try asking me to create a simple counter contract or any other zkApp you'd like 
               priority
               className="m-2 h-8 w-auto"
             />
+            <div className="pr-4">
+              <SocialLinks />
+            </div>
           </div>
           <div className="flex-1 overflow-auto p-4 space-y-4">
             {messages.map((message, index) => (
@@ -265,6 +271,16 @@ Try asking me to create a simple counter contract or any other zkApp you'd like 
                       ),
                       li: ({ children }) => (
                         <li className="text-inherit">{children}</li>
+                      ),
+                      a: ({ children, href }) => (
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-cyan-600 hover:text-cyan-800 underline"
+                        >
+                          {children}
+                        </a>
                       ),
                     }}
                   >
