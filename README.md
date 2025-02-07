@@ -8,6 +8,8 @@ MinaGPT transforms the way you build zkApps on the Mina blockchain, making it ef
 
 Imagine writing smart contracts in minutes with the help of **AI-guided suggestions** and **deploying them with a single click**, all without leaving your browser. Whether you're a curious newcomer or a seasoned developer, MinaGPT clears the path for your creativity, letting you focus on building the future instead of battling complexity. The possibilities are limitless—code, deploy, and innovate like never before!
 
+<img src="demo.gif" alt="MinaGPT Demo" width="100%" />
+
 ## Features
 
 - 💡 Write Smart Contracts with Ease: An intuitive interface for simple zkApp development, with AI-assisted coding and error detection.
