@@ -171,7 +171,7 @@ async function mina(userRequest: string): Promise<string> {
 
   const completion = await openai.chat.completions.create({
     messages: [{ role: 'user', content: prompt }],
-    model: 'DeepSeek-V3',
+    model: 'deepseek-ai/DeepSeek-V2.5',
   })
 
   console.log(completion)
@@ -187,7 +187,7 @@ app.get('/api/mina', async (req, res) => {
   try {
     const userRequest = req.query.prompt as string
     console.log('Received request:', userRequest)
-    
+
     if (!userRequest) {
       console.log('No prompt provided')
       res
@@ -195,11 +195,11 @@ app.get('/api/mina', async (req, res) => {
         .json({ success: false, error: 'Missing prompt parameter' })
       return
     }
-    
+
     console.log('Calling mina function...')
     const result = await mina(userRequest)
     console.log('Got result:', result)
-    
+
     res.json({ success: true, data: result })
   } catch (error: any) {
     console.error('Error:', error)

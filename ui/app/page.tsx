@@ -135,24 +135,34 @@ Try asking me to create a simple counter contract or any other zkApp you'd like 
     setInput("");
 
     // 这里添加与 GPT 交互的逻辑
-    // 示例响应:
+    const response = await fetch(
+      `http://localhost:5099/api/mina?prompt=${input}`
+    );
+    const data = await response.json();
     const assistantMessage = {
       role: "assistant",
-      content: `Here's a sample smart contract:
-\`\`\`typescript
-import { SmartContract, state, State, method } from "o1js";
-
-class Counter extends SmartContract {
-  @state(Field) counter = State<Field>();
-
-  @method increment() {
-    const currentCounter = this.counter.get();
-    this.counter.set(currentCounter.add(1));
-  }
-}
-\`\`\``,
+      content: data.data,
     } as Message;
+    console.log(data.data);
     setMessages((prev) => [...prev, assistantMessage]);
+    // 示例响应:
+    //     const assistantMessage = {
+    //       role: "assistant",
+    //       content: `Here's a sample smart contract:
+    // \`\`\`typescript
+    // import { SmartContract, state, State, method } from "o1js";
+
+    // class Counter extends SmartContract {
+    //   @state(Field) counter = State<Field>();
+
+    //   @method increment() {
+    //     const currentCounter = this.counter.get();
+    //     this.counter.set(currentCounter.add(1));
+    //   }
+    // }
+    // \`\`\``,
+    //     } as Message;
+    //     setMessages((prev) => [...prev, assistantMessage]);
   };
 
   return (
