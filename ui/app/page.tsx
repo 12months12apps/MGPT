@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import "./reactCOIServiceWorker";
 import ZkappWorkerClient from "./zkappWorkerClient";
 import { CodeEditor } from "../components/CodeEditor";
+import Image from "next/image";
 
 interface Message {
   role: "user" | "assistant";
@@ -168,8 +169,15 @@ class Counter extends SmartContract {
 
       {hasBeenSetup && (
         <>
-          <div className="p-4 border-b">
-            <div className="font-bold text-2xl">MinaGPT</div>
+          <div className="pl-2 border-b flex items-center">
+            <Image
+              src="/assets/MinaGPT.png"
+              alt="MinaGPT"
+              width={64}
+              height={64}
+              priority
+              className="m-2 h-8 w-auto"
+            />
           </div>
           <div className="flex-1 overflow-auto p-4 space-y-4">
             {messages.map((message, index) => (

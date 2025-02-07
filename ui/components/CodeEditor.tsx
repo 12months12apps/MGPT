@@ -49,6 +49,7 @@ export function CodeEditor({
   const handleCompileAndDeploy = async () => {
     if (!editorRef.current) return;
     setCompiledJs(null);
+    console.log(compiledJs);
     setStatus("Compiling TypeScript code...");
 
     try {
