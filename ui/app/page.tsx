@@ -138,7 +138,7 @@ Try asking me to create a simple counter contract or any other zkApp you'd like 
     try {
       const encodedPrompt = encodeURIComponent(input);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5099"}/api/mina?prompt=${encodedPrompt}`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5099/api/mina"}?prompt=${encodedPrompt}`,
         {
           headers: {
             Accept: "text/event-stream",
