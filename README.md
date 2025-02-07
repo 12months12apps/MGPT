@@ -8,7 +8,6 @@ Imagine writing smart contracts in minutes with the help of **AI-guided suggesti
 
 - 💡 Write Smart Contracts with Ease: An intuitive interface for simple zkApp development, with AI-assisted coding and error detection.
 - 🚀 One-Click Deployment: Deploy contracts directly from the browser with one click, using Mina Wallet for secure signing.
-- 🌐 Browser-Based Convenience: Write, test, and deploy zkApps from any device, no downloads or installations needed.
 - 🔗 Mina Wallet Integration: Easily connect and sign contracts with Mina Wallet, streamlining the deployment process.
 - 🎯 Built for All Developers: Whether beginner or expert, MinaGPT adapts to your skill level, providing tailored assistance for smart contract development.
 
@@ -16,8 +15,20 @@ Imagine writing smart contracts in minutes with the help of **AI-guided suggesti
 
 Get started with MinaGPT in three simple steps:
 
-- Connect your Mina wallet
+- Prepared your Auro wallet
 - Write zkApp code with AI assistance
 - Deploy with one click
 
 No setup required - start building in minutes!
+
+## How to run
+
+```
+cd backend
+pnpm install
+pnpm run dev
+
+cd ui
+pnpm install
+pnpm run dev
+```
