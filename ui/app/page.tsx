@@ -123,8 +123,19 @@ export default function Home() {
     // 示例响应:
     const assistantMessage = {
       role: "assistant",
-      content:
-        "Here's a sample smart contract:\n```solidity\ncontract Test {\n    uint256 value;\n    function setValue(uint256 _value) public {\n        value = _value;\n    }\n}\n```",
+      content: `Here's a sample smart contract:
+\`\`\`typescript
+import { SmartContract, state, State, method } from "o1js";
+
+class Counter extends SmartContract {
+  @state(Field) counter = State<Field>();
+
+  @method increment() {
+    const currentCounter = this.counter.get();
+    this.counter.set(currentCounter.add(1));
+  }
+}
+\`\`\``,
     } as Message;
     setMessages((prev) => [...prev, assistantMessage]);
   };
@@ -169,25 +180,27 @@ export default function Home() {
                 }`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg p-4 ${
+                  className={`${
                     message.role === "user"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100"
-                  }`}
+                      ? "max-w-[80%] bg-blue-500 text-white"
+                      : "w-full bg-gray-100"
+                  } rounded-lg p-4`}
                 >
                   <ReactMarkdown
                     components={{
                       code: ({ className, children, ...props }) => {
                         const match = /language-(\w+)/.exec(className || "");
                         return match ? (
-                          <CodeEditor
-                            zkappWorkerClient={zkappWorkerClient}
-                            hasBeenSetup={hasBeenSetup}
-                            accountExists={accountExists}
-                            publicKeyBase58={publicKeyBase58}
-                            setHasWallet={setHasWallet}
-                            initialCode={String(children).replace(/\n$/, "")}
-                          />
+                          <div className="w-full">
+                            <CodeEditor
+                              zkappWorkerClient={zkappWorkerClient}
+                              hasBeenSetup={hasBeenSetup}
+                              accountExists={accountExists}
+                              publicKeyBase58={publicKeyBase58}
+                              setHasWallet={setHasWallet}
+                              initialCode={String(children).replace(/\n$/, "")}
+                            />
+                          </div>
                         ) : (
                           <code className={className} {...props}>
                             {children}

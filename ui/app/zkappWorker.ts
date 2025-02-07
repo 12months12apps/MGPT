@@ -10,7 +10,8 @@ const state = {
   transaction: null as null | Transaction,
 };
 
-export const api = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const api: any = {
   async setActiveInstanceToDevnet() {
     const Network = Mina.Network('https://api.minascan.io/node/devnet/v1/graphql');
     console.log('Devnet network instance configured');

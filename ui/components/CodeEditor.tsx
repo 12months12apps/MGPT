@@ -1,5 +1,5 @@
 import { Editor } from "@monaco-editor/react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import * as typescript from "typescript";
 import ZkappWorkerClient from "../app/zkappWorkerClient";
 import { PrivateKey } from "o1js";
@@ -16,6 +16,7 @@ function compileTsToJs(tsCode: string) {
 }
 
 interface CodeEditorProps {
+  zkappWorkerClient: ZkappWorkerClient | null;
   hasBeenSetup: boolean;
   accountExists: boolean;
   publicKeyBase58: string;
@@ -33,24 +34,56 @@ export function CodeEditor({
 }: CodeEditorProps) {
   const [status, setStatus] = useState("");
   const [transactionHash, setTransactionHash] = useState("");
+  const [compiledJs, setCompiledJs] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditorDidMount = (editor: any) => {
     editorRef.current = editor;
+    if (initialCode) {
+      editor.setValue(initialCode);
+    }
   };
 
-  const handleCompile = async () => {
+  const handleCompileAndDeploy = async () => {
     if (!editorRef.current) return;
-    const tsCode = editorRef.current.getValue();
-    const jsCode = compileTsToJs(tsCode);
-    console.log(jsCode);
-    // NB: open worker code must be compiled before the app start
-    // it seems that without hacking the web worker, there is no way to compile the contract
-    // purely in the browser
-    // TODO: do more research on this, and make a work around by sending code to the backend,
-    // load the deploy transaction from the backend, and sign it in the browser.
+    setCompiledJs(null);
+    setStatus("Compiling TypeScript code...");
+
+    try {
+      // 1. 编译代码
+      const tsCode = editorRef.current.getValue();
+      if (!tsCode.trim()) {
+        setStatus("Error: Empty code");
+        return;
+      }
+
+      console.log("TypeScript code:", tsCode);
+      const jsCode = compileTsToJs(tsCode);
+
+      if (!jsCode || jsCode.includes("error")) {
+        setStatus("Error: Failed to compile TypeScript code");
+        return;
+      }
+
+      console.log("Compiled JavaScript:", jsCode);
+      setCompiledJs(jsCode);
+
+      // 2. 部署合约
+      const { hash } = await deployNewContract();
+      if (hash) {
+        setTransactionHash(hash);
+        setStatus("Contract deployed successfully!");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setStatus(`Operation failed: ${error.message}`);
+      } else {
+        setStatus("Operation failed with unknown error");
+      }
+      console.error("Error:", error);
+    }
   };
 
   const deployNewContract = async () => {
@@ -62,10 +95,10 @@ export function CodeEditor({
 
     setStatus("Loading contract...");
     await zkappWorkerClient!.loadContract();
-    
+
     setStatus("Compiling contract...");
     await zkappWorkerClient!.compileContract();
-    
+
     setStatus("Preparing deployment...");
     await zkappWorkerClient!.fetchAccount(publicKeyBase58);
 
@@ -92,20 +125,6 @@ export function CodeEditor({
     return { hash };
   };
 
-  const handleDeploy = async () => {
-    try {
-      const { hash } = await deployNewContract();
-      if (hash) {
-        setTransactionHash(hash);
-        setStatus("Contract deployed successfully!");
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        setStatus(`Deployment failed: ${error.message}`);
-      }
-    }
-  };
-
   const statusDisplay = transactionHash ? (
     <a
       href={`https://minascan.io/devnet/tx/${transactionHash}`}
@@ -119,34 +138,55 @@ export function CodeEditor({
     status
   );
 
-  useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.setValue(initialCode);
-    }
-  }, [initialCode]);
-
   return (
-    <div>
-      <Editor
-        height="50vh"
-        defaultLanguage="typescript"
-        theme="vs-dark"
-        onMount={handleEditorDidMount}
-        options={{
-          minimap: { enabled: false },
-        }}
-      />
-      <div className="flex flex-col gap-2.5 mt-2.5">
-        <div className="flex gap-2.5">
-          <button onClick={handleCompile}>Compile to JS</button>
+    <div className="w-full">
+      <div className="bg-[#1e1e1e] p-2 pl-4">
+        <div className="flex items-center gap-2.5">
           {hasBeenSetup && accountExists && (
-            <button onClick={handleDeploy}>Deploy Contract</button>
+            <button
+              onClick={handleCompileAndDeploy}
+              className="flex items-center gap-1.5 px-3 py-1 text-sm hover:bg-[#2d2d2d] rounded group"
+            >
+              <svg
+                viewBox="0 0 16 16"
+                className="w-4 h-4 text-[#4ec9b0] group-hover:text-white"
+                fill="currentColor"
+              >
+                <path d="M4 2v12l8.5-6L4 2z" />
+              </svg>
+              <span className="text-white">Deploy Contract</span>
+            </button>
           )}
         </div>
-        {status && (
-          <div className="mt-2.5 font-bold">
-            {statusDisplay}
+      </div>
+
+      <div className="bg-[#1e1e1e] border-t border-[#2d2d2d] pt-2">
+        <Editor
+          height="50vh"
+          width="100%"
+          defaultLanguage="typescript"
+          theme="vs-dark"
+          onMount={handleEditorDidMount}
+          options={{
+            minimap: { enabled: false },
+            fontSize: 14,
+            lineNumbers: "on",
+            wordWrap: "on",
+            wrappingIndent: "same",
+          }}
+        />
+      </div>
+
+      <div className="bg-[#1e1e1e] border-t border-[#2d2d2d] p-2">
+        {status ? (
+          <div className="text-sm font-mono text-white">
+            <div className="flex items-start gap-2">
+              <span className="text-[#4ec9b0]">&gt;</span>
+              {statusDisplay}
+            </div>
           </div>
+        ) : (
+          <div className="h-6" />
         )}
       </div>
     </div>
