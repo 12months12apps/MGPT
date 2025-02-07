@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://localhost:4000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -164,14 +164,16 @@ async function mina(userRequest: string): Promise<string> {
   
   当用户提出写 Mina 代码之外的需求时，请拒绝。
   当用户描述需求不清楚时，可以询问更具体的意图。
-  当你掌握了足够的信息后，不用描述你的理解或者代码的逻辑，直接输出代码即可。
+  当你掌握了足够的信息后，不用详细描述你的理解或者代码的逻辑，主要给出代码即可。然后询问是否还需要做什么修改，并表示点击代码框上方按钮可以部署合约。
+
+  采用用户提交的语言进行回答，除非用户明确要求。
 
   用户请求: ${userRequest}
   `
 
   const completion = await openai.chat.completions.create({
     messages: [{ role: 'user', content: prompt }],
-    model: 'deepseek-ai/DeepSeek-V2.5',
+    model: 'deepseek-ai/DeepSeek-V3',
   })
 
   console.log(completion)
