@@ -226,9 +226,9 @@ Try asking me to create a simple counter contract or any other zkApp you'd like 
                 <div
                   className={`${
                     message.role === "user"
-                      ? "max-w-[80%] bg-blue-500 text-white"
+                      ? "max-w-[80%] bg-cyan-400 text-white"
                       : "w-full bg-gray-100"
-                  } rounded-lg p-4`}
+                  } rounded-lg p-4 leading-loose`}
                 >
                   <ReactMarkdown
                     components={{
@@ -246,11 +246,26 @@ Try asking me to create a simple counter contract or any other zkApp you'd like 
                             />
                           </div>
                         ) : (
-                          <code className={className} {...props}>
+                          <code
+                            className={`${className} ${
+                              message.role === "user"
+                                ? "bg-cyan-200/30 text-cyan-100"
+                                : "bg-gray-200 text-pink-400"
+                            } px-1.5 py-1 rounded font-mono`}
+                            {...props}
+                          >
                             {children}
                           </code>
                         );
                       },
+                      ul: ({ children }) => (
+                        <ul className="list-disc list-inside space-y-1">
+                          {children}
+                        </ul>
+                      ),
+                      li: ({ children }) => (
+                        <li className="text-inherit">{children}</li>
+                      ),
                     }}
                   >
                     {message.content}
