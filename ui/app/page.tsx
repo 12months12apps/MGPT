@@ -1,8 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import "./reactCOIServiceWorker";
 import ZkappWorkerClient from "./zkappWorkerClient";
 import { CodeEditor } from "../components/CodeEditor";
+
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
 
 export default function Home() {
   const [zkappWorkerClient, setZkappWorkerClient] =
@@ -11,6 +17,8 @@ export default function Home() {
   const [hasBeenSetup, setHasBeenSetup] = useState(false);
   const [accountExists, setAccountExists] = useState(false);
   const [publicKeyBase58, setPublicKeyBase58] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
   const [displayText, setDisplayText] = useState("");
 
   const displayStep = (step: string) => {
@@ -85,39 +93,15 @@ export default function Home() {
     checkAccountExists();
   }, [zkappWorkerClient, hasBeenSetup, accountExists, publicKeyBase58]);
 
-  let auroLinkElem;
-  if (hasWallet === false) {
-    auroLinkElem = (
-      <div>
-        Could not find a wallet.{" "}
-        <a 
-          href="https://www.aurowallet.com/" 
-          target="_blank" 
-          rel="noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          Install Auro wallet here
-        </a>
-      </div>
-    );
-  }
-
-  const setup = (
-    <div className="font-bold text-2xl pb-20">
-      {displayText}
-      {auroLinkElem}
-    </div>
-  );
-
   let accountDoesNotExist;
   if (hasBeenSetup && !accountExists) {
     const faucetLink = `https://faucet.minaprotocol.com/?address='${publicKeyBase58}`;
     accountDoesNotExist = (
       <div>
         <span className="pr-4">Account does not exist.</span>
-        <a 
-          href={faucetLink} 
-          target="_blank" 
+        <a
+          href={faucetLink}
+          target="_blank"
           rel="noreferrer"
           className="text-blue-600 hover:text-blue-800 underline"
         >
@@ -127,23 +111,117 @@ export default function Home() {
     );
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const userMessage = { role: "user", content: input } as Message;
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+
+    // 这里添加与 GPT 交互的逻辑
+    // 示例响应:
+    const assistantMessage = {
+      role: "assistant",
+      content:
+        "Here's a sample smart contract:\n```solidity\ncontract Test {\n    uint256 value;\n    function setValue(uint256 _value) public {\n        value = _value;\n    }\n}\n```",
+    } as Message;
+    setMessages((prev) => [...prev, assistantMessage]);
+  };
+
   return (
-    <>
-      <div className="p-0">
-        <div className="p-0">
-          {setup}
-          {accountDoesNotExist}
+    <div className="flex flex-col h-screen">
+      {!hasBeenSetup && (
+        <div className="flex items-center justify-center flex-1">
+          <div className="text-center">
+            <div className="font-bold text-2xl mb-4">
+              {displayText}
+              {hasWallet === false && (
+                <div>
+                  Could not find a wallet.{" "}
+                  <a
+                    href="https://www.aurowallet.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    Install Auro wallet here
+                  </a>
+                </div>
+              )}
+            </div>
+            {accountDoesNotExist}
+          </div>
         </div>
-      </div>
-      {hasBeenSetup && accountExists && (
-        <CodeEditor
-          zkappWorkerClient={zkappWorkerClient}
-          hasBeenSetup={hasBeenSetup}
-          accountExists={accountExists}
-          publicKeyBase58={publicKeyBase58}
-          setHasWallet={setHasWallet}
-        />
       )}
-    </>
+
+      {hasBeenSetup && (
+        <>
+          <div className="p-4 border-b">
+            <div className="font-bold text-2xl">MinaGPT</div>
+          </div>
+          <div className="flex-1 overflow-auto p-4 space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  message.role === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg p-4 ${
+                    message.role === "user"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100"
+                  }`}
+                >
+                  <ReactMarkdown
+                    components={{
+                      code: ({ className, children, ...props }) => {
+                        const match = /language-(\w+)/.exec(className || "");
+                        return match ? (
+                          <CodeEditor
+                            zkappWorkerClient={zkappWorkerClient}
+                            hasBeenSetup={hasBeenSetup}
+                            accountExists={accountExists}
+                            publicKeyBase58={publicKeyBase58}
+                            setHasWallet={setHasWallet}
+                            initialCode={String(children).replace(/\n$/, "")}
+                          />
+                        ) : (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        );
+                      },
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-4 border-t">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your message..."
+                className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Send
+              </button>
+            </div>
+          </form>
+        </>
+      )}
+    </div>
   );
 }

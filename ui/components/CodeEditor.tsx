@@ -1,5 +1,5 @@
 import { Editor } from "@monaco-editor/react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import * as typescript from "typescript";
 import ZkappWorkerClient from "../app/zkappWorkerClient";
 import { PrivateKey } from "o1js";
@@ -16,20 +16,21 @@ function compileTsToJs(tsCode: string) {
 }
 
 interface CodeEditorProps {
-  zkappWorkerClient: ZkappWorkerClient | null;
   hasBeenSetup: boolean;
   accountExists: boolean;
   publicKeyBase58: string;
   setHasWallet: (hasWallet: boolean) => void;
+  initialCode?: string;
 }
 
-export const CodeEditor = ({
+export function CodeEditor({
   zkappWorkerClient,
   hasBeenSetup,
   accountExists,
   publicKeyBase58,
   setHasWallet,
-}: CodeEditorProps) => {
+  initialCode = "",
+}: CodeEditorProps) {
   const [status, setStatus] = useState("");
   const [transactionHash, setTransactionHash] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -118,6 +119,12 @@ export const CodeEditor = ({
     status
   );
 
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.setValue(initialCode);
+    }
+  }, [initialCode]);
+
   return (
     <div>
       <Editor
@@ -144,4 +151,4 @@ export const CodeEditor = ({
       </div>
     </div>
   );
-};
+}
