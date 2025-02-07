@@ -5,6 +5,7 @@ import "./reactCOIServiceWorker";
 import ZkappWorkerClient from "./zkappWorkerClient";
 import { CodeEditor } from "../components/CodeEditor";
 import Image from "next/image";
+import { ChatInput } from "../components/ChatInput";
 
 interface Message {
   role: "user" | "assistant";
@@ -33,7 +34,6 @@ I can help you:
 Try asking me to create a simple counter contract or any other zkApp you'd like to build!`,
     },
   ]);
-  const [input, setInput] = useState("");
   const [displayText, setDisplayText] = useState("");
 
   const displayStep = (step: string) => {
@@ -126,13 +126,11 @@ Try asking me to create a simple counter contract or any other zkApp you'd like 
     );
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (input: string) => {
     if (!input.trim()) return;
 
     const userMessage = { role: "user", content: input } as Message;
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
 
     const assistantMessage = { role: "assistant", content: "" } as Message;
     setMessages((prev) => [...prev, assistantMessage]);
@@ -262,23 +260,7 @@ Try asking me to create a simple counter contract or any other zkApp you'd like 
             ))}
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4 border-t">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                Send
-              </button>
-            </div>
-          </form>
+          <ChatInput onSubmit={handleSubmit} />
         </>
       )}
     </div>
